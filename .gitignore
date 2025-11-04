@@ -1,0 +1,6 @@
+/build/
+thirdparty/
+CMakeFiles/
+CMakeCache.txt
+*.o
+.cache/
