@@ -2,7 +2,7 @@
 #include "SDL3/SDL_log.h"
 #include "SDL3/SDL_scancode.h"
 #include "pipe.hpp"
-#include <string>
+#include "score.hpp"
 #define SDL_MAIN_USE_CALLBACKS 1 /* use the callbacks instead of main() */
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
@@ -92,6 +92,11 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
             pipeIdx = (pipeIdx + 1) % 5;
         }
     }
+
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);  /* white, full alpha */
+    SDL_SetRenderScale(renderer, 3.0f, 3.0f);
+    SDL_RenderDebugText(renderer, 10, 10, Score::getScore().c_str());
+    SDL_SetRenderScale(renderer, 1.0f, 1.0f);
 
     /* put the newly-cleared rendering on the screen. */
     SDL_RenderPresent(renderer);
