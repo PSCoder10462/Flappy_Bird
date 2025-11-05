@@ -9,8 +9,10 @@ class Pipe {
     Pipe();
 
     // getters
-    const std::pair<SDL_FRect, SDL_FRect> &Rect();
+    std::pair<SDL_FRect, SDL_FRect> &Rect();
+    void Respawn();
 
   private:
     std::pair<SDL_FRect, SDL_FRect> rect;
+    float spawnTime = 0;
 };

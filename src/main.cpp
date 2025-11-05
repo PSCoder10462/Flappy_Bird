@@ -2,6 +2,7 @@
 #include "SDL3/SDL_log.h"
 #include "SDL3/SDL_scancode.h"
 #include "pipe.hpp"
+#include <string>
 #define SDL_MAIN_USE_CALLBACKS 1 /* use the callbacks instead of main() */
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
@@ -13,7 +14,9 @@
 static SDL_Window *window = NULL;
 static SDL_Renderer *renderer = NULL;
 static Bird bird;
-static Pipe pipe;
+static std::vector<Pipe> pipes;
+static int spawnNeeded = c_pipeSpawnTime;
+static int pipeIdx = 0;
 
 /* This function runs once at startup. */
 SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
@@ -37,9 +40,8 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
     return SDL_APP_CONTINUE; /* carry on with the program! */
 }
 
-
-static void s_handleKeyDown(const SDL_Scancode& scancode) {
-    if (scancode== SDL_SCANCODE_SPACE)
+static void s_handleKeyDown(const SDL_Scancode &scancode) {
+    if (scancode == SDL_SCANCODE_SPACE)
         bird.Jump();
 }
 
@@ -58,9 +60,8 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event) {
 
 /* This function runs once per frame, and is the heart of the program. */
 SDL_AppResult SDL_AppIterate(void *appstate) {
-    SDL_SetRenderDrawColor(
-        renderer, c_skyRGB[0], c_skyRGB[1], c_skyRGB[2],
-        SDL_ALPHA_OPAQUE_FLOAT); /* new color, full alpha. */
+    SDL_SetRenderDrawColor(renderer, c_skyRGB[0], c_skyRGB[1], c_skyRGB[2],
+                           SDL_ALPHA_OPAQUE_FLOAT); /* new color, full alpha. */
     /* clear the window to the draw color. */
     SDL_RenderClear(renderer);
 
@@ -71,13 +72,29 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
     SDL_SetRenderDrawColor(renderer, c_pipeRGB[0], c_pipeRGB[1], c_pipeRGB[2],
                            SDL_ALPHA_OPAQUE); /* blue, full alpha */
 
-    SDL_RenderFillRect(renderer, &pipe.Rect().first);
-    SDL_RenderFillRect(renderer, &pipe.Rect().second);
+    auto now = static_cast<int>((1.8f * SDL_GetTicks()) / 1000.0);
 
+    for (auto &pipe : pipes) {
+        SDL_RenderFillRect(renderer, &(pipe.Rect().first));
+        SDL_RenderFillRect(renderer, &(pipe.Rect().second));
+    }
+
+    if (now == spawnNeeded) {
+        if (pipes.size() < 5) {
+            Pipe pipe;
+            pipes.push_back(pipe);
+            spawnNeeded += c_pipeSpawnTime;
+        } else if (pipes[pipeIdx].Rect().first.x +
+                       pipes[pipeIdx].Rect().first.w <
+                   0) {
+            pipes[pipeIdx].Respawn();
+            spawnNeeded += c_pipeSpawnTime;
+            pipeIdx = (pipeIdx + 1) % 5;
+        }
+    }
 
     /* put the newly-cleared rendering on the screen. */
     SDL_RenderPresent(renderer);
-
 
     return SDL_APP_CONTINUE; /* carry on with the program! */
 }
