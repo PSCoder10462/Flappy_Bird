@@ -4,14 +4,12 @@
 
 class Bird {
   public:
-    // c'tor
+    // constructor
     Bird();
 
     // getters
-    const SDL_FRect &Rect() const;
-
-    // setters
-    // void Rect(const std::pair<float, float> &value);
+    const SDL_FRect &Rect();
+    void Jump();
 
   private:
     SDL_FRect rect;
