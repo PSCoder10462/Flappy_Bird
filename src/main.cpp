@@ -1,11 +1,10 @@
 #include "SDL3/SDL_events.h"
 #include "SDL3/SDL_log.h"
 #include "SDL3/SDL_scancode.h"
+#include "pipe.hpp"
 #define SDL_MAIN_USE_CALLBACKS 1 /* use the callbacks instead of main() */
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
-
-#include <string>
 
 #include "bird.hpp"
 #include "constants.hpp"
@@ -14,6 +13,7 @@
 static SDL_Window *window = NULL;
 static SDL_Renderer *renderer = NULL;
 static Bird bird;
+static Pipe pipe;
 
 /* This function runs once at startup. */
 SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
@@ -67,6 +67,13 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
     SDL_SetRenderDrawColor(renderer, c_birdRGB[0], c_birdRGB[1], c_birdRGB[2],
                            SDL_ALPHA_OPAQUE); /* blue, full alpha */
     SDL_RenderFillRect(renderer, &bird.Rect());
+
+    SDL_SetRenderDrawColor(renderer, c_pipeRGB[0], c_pipeRGB[1], c_pipeRGB[2],
+                           SDL_ALPHA_OPAQUE); /* blue, full alpha */
+
+    SDL_RenderFillRect(renderer, &pipe.Rect().first);
+    SDL_RenderFillRect(renderer, &pipe.Rect().second);
+
 
     /* put the newly-cleared rendering on the screen. */
     SDL_RenderPresent(renderer);
