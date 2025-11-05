@@ -35,3 +35,12 @@ void Bird::Jump() {
     prevY = rect.y;
     upSpeed = c_birdJumpSpeed;
 }
+
+void Bird::Reset() {
+    rect.x = 20.0;
+    rect.y = (c_windowHeight - c_birdHeight) / 2.0;
+    rect.h = c_birdHeight;
+    rect.w = c_birdWidth;
+    jumpTime = (1.0 * SDL_GetTicks()) / 1000.0;
+    prevY = (c_windowHeight - c_birdHeight) / 2.0;
+}

@@ -40,9 +40,54 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
     return SDL_APP_CONTINUE; /* carry on with the program! */
 }
 
+static void s_restartGame() {
+    bird.Reset();
+    Score::Reset();
+    pipes.clear();
+}
+
 static void s_handleKeyDown(const SDL_Scancode &scancode) {
     if (scancode == SDL_SCANCODE_SPACE)
         bird.Jump();
+    else if (scancode == SDL_SCANCODE_R)
+        s_restartGame();
+}
+
+static void s_checkCollision() {
+    // bird, pipe
+    auto checkOverlapIntervals = [](const float &a, const float &b,
+                                    const float &x, const float &y) {
+        if (b < x || a > y)
+            return false;
+        return true;
+    };
+
+    bool collisionX = false;
+    bool collisionY = false;
+    for (auto &pipe : pipes) {
+        // horizontal
+        auto bx = bird.Rect().x;
+        auto bxEnd = bx + c_birdWidth;
+        auto px = pipe.Rect().first.x;
+        auto pxEnd = px + c_pipeWidth;
+        collisionX = checkOverlapIntervals(bx, bxEnd, px, pxEnd);
+
+        // vertical
+        auto by = bird.Rect().y;
+        auto byEnd = by + c_birdHeight;
+        auto py1 = pipe.Rect().first.y;
+        auto py1End = py1 + pipe.Rect().first.h;
+        auto py2 = pipe.Rect().second.y;
+        auto py2End = py2 + pipe.Rect().second.h;
+
+        collisionY = checkOverlapIntervals(by, byEnd, py1, py1End) ||
+                     checkOverlapIntervals(by, byEnd, py2, py2End);
+
+        if (collisionX && collisionY) break;
+    }
+
+    if (collisionX && collisionY)
+        s_restartGame();
 }
 
 /* This function runs when a new event (mouse input, keypresses, etc) occurs. */
@@ -93,10 +138,13 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
         }
     }
 
-    SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);  /* white, full alpha */
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255,
+                           SDL_ALPHA_OPAQUE); /* white, full alpha */
     SDL_SetRenderScale(renderer, 3.0f, 3.0f);
     SDL_RenderDebugText(renderer, 10, 10, Score::getScore().c_str());
     SDL_SetRenderScale(renderer, 1.0f, 1.0f);
+
+    s_checkCollision();
 
     /* put the newly-cleared rendering on the screen. */
     SDL_RenderPresent(renderer);

@@ -10,6 +10,7 @@ class Bird {
     // getters
     const SDL_FRect &Rect();
     void Jump();
+    void Reset();
 
   private:
     SDL_FRect rect;
