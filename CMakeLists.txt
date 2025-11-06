@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 3.22)
-project(SDL3Demo LANGUAGES C CXX)
+
+# Define the project and executable name as a variable for consistency
+set(PROJECT_NAME "Flappy_Bird")
+project(${PROJECT_NAME} LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -34,11 +37,10 @@ add_subdirectory(${SDL3_SOURCE_DIR} ${CMAKE_BINARY_DIR}/sdl3_build EXCLUDE_FROM_
 file(GLOB_RECURSE SRC_FILES CONFIGURE_DEPENDS src/*.cpp)
 
 # Create executable
-add_executable(SDL3Demo ${SRC_FILES})
+add_executable(${PROJECT_NAME} ${SRC_FILES})
 
 # Include your headers
-target_include_directories(SDL3Demo PRIVATE ${CMAKE_SOURCE_DIR}/include)
+target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/include)
 
 # Link SDL3
-target_link_libraries(SDL3Demo PRIVATE SDL3::SDL3)
-
+target_link_libraries(${PROJECT_NAME} PRIVATE SDL3::SDL3)
